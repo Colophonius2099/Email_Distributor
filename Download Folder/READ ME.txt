@@ -1,0 +1,35 @@
+Dieses Programm dient dazu alle ausgewählten E-Mail-Listen aus Scoreg zu generieren.
+Das Programm besteht aus 4 Dateien: 'EmailDistributor.jar', 'config.json', 'Runner.bat' und dieses ReadMe. 
+Programm funktioniert nur wenn der User die richtigen Rechte in Scoreg hat und alle Log-In Details richtig eingetragen sind.
+
+"EmailDistributor.jar"
+Das compilierte Java Programm, welches die eigentliche Arbeit verrichtet.
+
+"Runner.bat" 
+Führt das Java Programm richtig aus. Einfach ancklicken oder ausführen lassen um das Programm zu starten.
+
+"config.json" 
+Konfiguriert die Einstellungen für das Java Programm. 
+Wenn man das Programm noch nie ausgeführt hat, bekommt mein eine Sample config namens 'config.json.sample'. 
+Nach dem Ausfüllen, soll die Endung '.sample' gelöscht werden
+
+Das ist die Form den config.json, mit Erklärung:
+
+				{
+				  "Mail-List Filepath": "FILL OUT - MAY BE LEFT EMPTY",  
+								--> 	Wohin die mail list hingeschrieben werden sollen. 
+										Wenn nicht konfiguriert, wird ein Ordner 'Verteiler' erstellt. Dieser befindet sich im selben Ordner wie 'EmailDistributor.jar'.
+				  "Logging Filepath": "FILL OUT - MAY BE LEFT EMPTY",
+								--> 	Wohin die Logs hingeschrieben werden sollen.  Logs verzeichnen Prozess und Fehler des Programmes. Logs sind nach Datum sortiert
+										Wenn nicht konfiguriert wird ein Ordner 'Logs' erstellt. Dieser befindet sich im selben Ordner wie 'EmailDistributor.jar'.						
+				  "Selected Mail Lists": ["WiWoe", "GuSp", "CaEx", "RaRo", "Info", "ScoutFix", "Gruppenrat"],
+								--> 	Welche Mail list erstellt werden soll, die in der Liste oben, sind alle derzeit möglichen.		  
+				  "Scoreg Login Username": "",
+				  				--> 	Dein Scoreg Login Username
+				  "Scoreg Login Password": "",
+				  				--> 	Dein Scoreg Login Password
+				  "Scoreg Access Key": "",
+								--> 	Dein Scoreg Access Key, muss jedes mal neu in Scoreg erstellt werden. Einmal erstellt, kann er möglicherweise nicht mehr aufgerufen werden.
+				  "Scoreg Org ID": ""
+								---> Organisations ID - nur notwendig wenn man in mehreren Pfadfinder Organisationen tätig ist
+				}
