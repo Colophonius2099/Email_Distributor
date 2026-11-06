@@ -1,19 +1,12 @@
 package Logger;
 
-import Main.ConfigReader;
-
-import java.io.File;
 import java.io.IOException;
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.logging.*;
 
 public class MyLogger {
 
     private final Logger LOGGER;
-    private final String filepath = ConfigReader.getInstance().getLoggingPath();
     private static MyLogger genericLogger = null;
 
     public MyLogger(String className) {
@@ -30,30 +23,13 @@ public class MyLogger {
         consoleHandler.setLevel(Level.ALL);
         consoleHandler.setFormatter(new MyCustomFormatter());
 
-
-        // Create a file handler
-        File folder = new File(filepath);
-
-        if (!folder.exists()) {
-            folder.mkdir();
-        }
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH-mm-ss");
-        String filename = filepath
-                        + "Logs_("
-                        + LocalDateTime.now(Clock.systemDefaultZone()).format(formatter)
-                        + ").txt";
-
         FileHandler fileHandler = null;
 
         try {
-            fileHandler = new FileHandler(filename, true);
+            fileHandler = LoggingPathSingleton.GET_LOGGING_FILEHANDLER();
         } catch (IOException e) {
             log(e.getMessage());
         }
-
-        fileHandler.setLevel(Level.ALL);
-        fileHandler.setFormatter(new MyCustomFormatter());
 
         // Add handlers to the logger
         LOGGER.addHandler(consoleHandler);
