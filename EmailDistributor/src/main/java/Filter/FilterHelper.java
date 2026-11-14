@@ -10,25 +10,20 @@ import java.util.stream.Collectors;
 public class FilterHelper {
 
     public enum Distributor {
-        WiWoe, GuSp, CaEx, RaRo, Info, ScoutFix, Gruppenrat
+        WiWö, GuSp, CaEx, RaRo, Info, ScoutFix, Gruppenrat, Leiter
     }
 
     private final JobFilter jobFilter;
     private final SectionFilter sectionFilter;
+    private final AuthorisationFilter authorisationFilter;
+
     private final MyLogger logger;
 
     public FilterHelper() {
         this.sectionFilter = new SectionFilter();
         this.jobFilter = new JobFilter(sectionFilter.getSectionFilterMap());
+        this.authorisationFilter = new AuthorisationFilter(jobFilter);
         logger = new MyLogger("FilterHelper");
-    }
-
-    public JobFilter getJobFilter() {
-        return jobFilter;
-    }
-
-    public SectionFilter getSectionFilter() {
-        return sectionFilter;
     }
 
     public Boolean isStufe(ScoregMemberComplete member, SectionFilter.Stufe stufe) {
@@ -44,9 +39,17 @@ public class FilterHelper {
         return list.parallelStream().filter(filter).collect(Collectors.toList());
     }
 
+    public List<ScoregMemberComplete> filterListForAuthorization(
+            List<ScoregMemberComplete> list,
+            Distributor distributor
+    ) {
+        Predicate<ScoregMemberComplete> filter = generateAuthorizationFilter(distributor);
+        return list.parallelStream().filter(filter).collect(Collectors.toList());
+    }
+
     private Predicate<ScoregMemberComplete> generateFilter(Distributor distributor) {
         return switch (distributor) {
-            case WiWoe -> memberComplete -> isStufe(memberComplete, SectionFilter.Stufe.WiWoe);
+            case WiWö -> memberComplete -> isStufe(memberComplete, SectionFilter.Stufe.WiWoe);
             case GuSp -> memberComplete -> isStufe(memberComplete, SectionFilter.Stufe.GuSp);
             case CaEx -> memberComplete -> isStufe(memberComplete, SectionFilter.Stufe.CaEx);
             case RaRo -> memberComplete -> isStufe(memberComplete, SectionFilter.Stufe.RaRo);
@@ -57,6 +60,11 @@ public class FilterHelper {
             case Info -> memberComplete -> isStufe(memberComplete, SectionFilter.Stufe.ANY)
                     || jobFilter.isGruppenratParticipant(memberComplete)
                     || jobFilter.isZBV(memberComplete);
+            case Leiter -> memberComplete ->  jobFilter.isLeiter(memberComplete, SectionFilter.Stufe.ANY);
         };
+    }
+
+    private Predicate<ScoregMemberComplete> generateAuthorizationFilter(Distributor distributor) {
+        return memberComplete -> authorisationFilter.hasSendRights(memberComplete, distributor);
     }
 }

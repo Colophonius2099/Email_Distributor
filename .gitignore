@@ -1,2 +1,3 @@
 /out/
-/EmailDistributor/config.json
+/EmailDistributor/configSettings.json
+/EmailDistributor/configTestSettings.json
