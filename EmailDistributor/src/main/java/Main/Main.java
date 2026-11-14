@@ -31,7 +31,7 @@ public class Main {
         List<FutureTask<ScoregMemberComplete>> taskList = loader.generateWorkflow();
         List<ScoregMemberComplete> completes = loader.endWorkflow(taskList);
 
-        generator.generateAllMailLists(completes, filterHelper);
+        generator.generateAllMailLists(completes);
         logger.log("Finished Workflow - all selected Mail Lists were generated");
     }
 }

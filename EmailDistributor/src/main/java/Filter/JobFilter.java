@@ -39,9 +39,7 @@ public class JobFilter {
         });
 
         List<List<String>> combined = List.of(wiwoeLeiterFilter, guspLeiterFilter, caexLeiterFilter, raroLeiterFilter);
-        combined.forEach(list -> {
-            leiterFilter.addAll(list);
-        });
+        combined.forEach(list -> leiterFilter.addAll(list));
     }
 
 
@@ -86,6 +84,12 @@ public class JobFilter {
             case ANY -> jobList.stream().anyMatch(leiterFilter::contains);
             case NONE -> false;
         };
+    }
+
+    public Boolean isStufenleitung(ScoregMemberComplete member) {
+        List<String> jobList = Arrays.stream(member.getJobList().split(",")).toList();
+        if (Objects.isNull(member.getJobList())) return false;
+        return jobList.stream().anyMatch(s -> s.contains("SF"));
     }
 
     public Boolean isGruppenratParticipant(ScoregMemberComplete member) {

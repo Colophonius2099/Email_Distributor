@@ -6,7 +6,6 @@ import Main.ConfigReader;
 import ScoregDataSctructure.ScoregMemberComplete;
 import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,35 +13,29 @@ import java.util.Map;
 public class MailListGenerator {
 
     private final List<FilterHelper.Distributor> selectedMailLists;
-    private final MailListWriter mailListWriter;
     private final MyLogger logger;
 
     @Getter
-    private final Map<FilterHelper.Distributor, List<String>> selectedMailListMap;
+    private final Map<FilterHelper.Distributor, MailList> selectedMailListMap;
 
     public MailListGenerator () {
         selectedMailLists = ConfigReader.getInstance().getSelectedMailLists();
-        mailListWriter = new MailListWriter();
         selectedMailListMap = new HashMap<>();
-        selectedMailLists.forEach(distributor -> selectedMailListMap.put(distributor, new ArrayList<>()));
+        selectedMailLists.forEach(distributor -> selectedMailListMap.put(distributor, null));
 
         logger = new MyLogger("MailListGenerator");
     }
 
     public void generateAllMailLists(
-            List<ScoregMemberComplete> completes,
-            FilterHelper filterHelper
+            List<ScoregMemberComplete> completes
     ) {
-        MailListCSVCreator csvCreator = new MailListCSVCreator();
+        MailSettingCreator csvCreator = new MailSettingCreator();
 
         selectedMailLists.forEach(listName -> {
             logger.log("Gathering " + listName.name() + " Emails");
-            List<ScoregMemberComplete> filtered = filterHelper.filterList(completes, listName);
-            List<String> mailList = new ArrayList();
-            filtered.forEach(s -> mailList.addAll(s.getRelevantEmails()));
-            mailListWriter.writeMailListToFile(listName, mailList);
-            selectedMailListMap.put(listName, mailList);
+            selectedMailListMap.put(listName, new MailList(completes, listName));
         });
-        csvCreator.generateCSVFile(selectedMailListMap);
+        csvCreator.generateJSONFile(selectedMailListMap);
+        csvCreator.generateCSVFile(selectedMailListMap.keySet());
     }
 }
