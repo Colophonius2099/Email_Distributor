@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,7 +39,7 @@ public class MailSettingCreator {
             Map<String, Object> listsMap = new HashMap<>();
 
             for (FilterHelper.Distributor key  : emailMap.keySet()) {
-                listsMap.put(key.name(), emailMap.get(key).toJsonObject());
+                listsMap.put(key.name().toLowerCase(Locale.ROOT), emailMap.get(key).toJsonObject());
             }
 
             rootMap.put("lists", listsMap);
@@ -56,10 +57,10 @@ public class MailSettingCreator {
     protected void generateCSVFile(Set<FilterHelper.Distributor> selectedDistributors) {
         logger.log("Started generating CSV");
 
-        StringBuilder csvText = new StringBuilder();
+        StringBuilder csvText = new StringBuilder("info; Sendet emails weiter an orignale Info; info@pfadfindergruppe71.at\n");
 
         for (FilterHelper.Distributor distributor: selectedDistributors) {
-            csvText.append(distributor.name()).append("; Sendet emails an webmaster zur verteilung; webmaster@pfadfindergruppewien71.a\n");
+            csvText.append(distributor.name()).append("; Sendet emails an webmaster zur verteilung; webmaster@pfadfindergruppewien71.at\n");
         }
 
         String dir = filePath;

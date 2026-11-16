@@ -133,7 +133,7 @@ public class ConfigReader {
 
     private static Path getConfigPath(Path appPath) throws URISyntaxException {
         return appPath
-                .resolve("configTestSettings.json");
+                .resolve("configSettings.json");
     }
 
     public static ConfigReader getInstance() {

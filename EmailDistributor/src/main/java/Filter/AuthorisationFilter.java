@@ -18,11 +18,11 @@ public class AuthorisationFilter {
         List<String> jobList = Arrays.stream(member.getJobList().split(",")).toList();
         if (Objects.isNull(member.getJobList())) return false;
         Boolean hasSendRight = switch (distributor) {
-            case WiWö -> jobFilter.isLeiter(member, SectionFilter.Stufe.WiWoe) && jobFilter.isStufenleitung(member);
+            case WiWoe -> jobFilter.isLeiter(member, SectionFilter.Stufe.WiWoe) && jobFilter.isStufenleitung(member);
             case GuSp -> jobFilter.isLeiter(member, SectionFilter.Stufe.GuSp) && jobFilter.isStufenleitung(member);
             case CaEx -> jobFilter.isLeiter(member, SectionFilter.Stufe.CaEx) && jobFilter.isStufenleitung(member);
             case RaRo -> jobFilter.isLeiter(member, SectionFilter.Stufe.RaRo) && jobFilter.isStufenleitung(member);
-            case Info -> false;
+            case Gruppe -> jobFilter.isERO(member);
             case ScoutFix -> jobFilter.isLeiter(member, SectionFilter.Stufe.ANY);
             case Gruppenrat -> false;
             case Leiter -> jobFilter.isLeiter(member, SectionFilter.Stufe.ANY);

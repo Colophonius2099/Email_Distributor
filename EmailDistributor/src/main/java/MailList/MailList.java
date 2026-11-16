@@ -4,10 +4,7 @@ import Filter.FilterHelper;
 import ScoregDataSctructure.ScoregMemberComplete;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MailList {
 
@@ -33,8 +30,8 @@ public class MailList {
 
     private String generateDiscription(FilterHelper.Distributor distributor) {
         return switch (distributor) {
-            case WiWö, GuSp, CaEx, RaRo -> "Schickt aus an alle " + distributor.name();
-            case Info -> "Schickt aus an alle Gruppenmitglieder";
+            case WiWoe, GuSp, CaEx, RaRo -> "Schickt aus an alle " + distributor.name();
+            case Gruppe -> "Schickt aus an alle Gruppenmitglieder";
             case ScoutFix -> "Schickt aus an alle für Scout Fix relevante";
             case Gruppenrat -> "Schickt aus an alle GruppenratteilnehmerInnen";
             case Leiter -> "Schickt an aktive Leiter";
@@ -45,7 +42,7 @@ public class MailList {
         Map<String, Object> listDetails = new HashMap<>();
 
         listDetails.put("description", generateDiscription(distributor));
-        listDetails.put("name", name);
+        listDetails.put("name",name);
         listDetails.put("allowed_senders", authorisations);
         listDetails.put("recipients", mailList);
 

@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class FilterHelper {
 
     public enum Distributor {
-        WiWö, GuSp, CaEx, RaRo, Info, ScoutFix, Gruppenrat, Leiter
+        WiWoe, GuSp, CaEx, RaRo, Gruppe, ScoutFix, Gruppenrat, Leiter
     }
 
     private final JobFilter jobFilter;
@@ -49,7 +49,7 @@ public class FilterHelper {
 
     private Predicate<ScoregMemberComplete> generateFilter(Distributor distributor) {
         return switch (distributor) {
-            case WiWö -> memberComplete -> isStufe(memberComplete, SectionFilter.Stufe.WiWoe);
+            case WiWoe -> memberComplete -> isStufe(memberComplete, SectionFilter.Stufe.WiWoe);
             case GuSp -> memberComplete -> isStufe(memberComplete, SectionFilter.Stufe.GuSp);
             case CaEx -> memberComplete -> isStufe(memberComplete, SectionFilter.Stufe.CaEx);
             case RaRo -> memberComplete -> isStufe(memberComplete, SectionFilter.Stufe.RaRo);
@@ -57,7 +57,7 @@ public class FilterHelper {
             case ScoutFix -> memberComplete -> jobFilter.isGruppenratParticipant(memberComplete)
                     || jobFilter.isZBV(memberComplete)
                     || jobFilter.isMitarbeiter(memberComplete);
-            case Info -> memberComplete -> isStufe(memberComplete, SectionFilter.Stufe.ANY)
+            case Gruppe -> memberComplete -> isStufe(memberComplete, SectionFilter.Stufe.ANY)
                     || jobFilter.isGruppenratParticipant(memberComplete)
                     || jobFilter.isZBV(memberComplete);
             case Leiter -> memberComplete ->  jobFilter.isLeiter(memberComplete, SectionFilter.Stufe.ANY);
