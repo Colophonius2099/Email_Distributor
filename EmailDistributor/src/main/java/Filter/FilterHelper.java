@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class FilterHelper {
 
     public enum Distributor {
-        WiWoe, GuSp, CaEx, RaRo, Gruppe, ScoutFix, Gruppenrat, Leiter
+        WiWoe, GuSp, CaEx, RaRo, Gruppe, ScoutFix, Gruppenrat, Leiter, Elternrat
     }
 
     private final JobFilter jobFilter;
@@ -27,7 +27,11 @@ public class FilterHelper {
     }
 
     public Boolean isStufe(ScoregMemberComplete member, SectionFilter.Stufe stufe) {
-        return sectionFilter.isStufe(member,stufe) || jobFilter.isLeiter(member, stufe);
+        return sectionFilter.isStufe(member,stufe) || jobFilter.hasJob(member, JobFilter.Job.Leiter, stufe);
+    }
+
+    public Boolean isTeilnehmer(ScoregMemberComplete member) {
+        return sectionFilter.isStufe(member, SectionFilter.Stufe.ANY);
     }
 
     public List<ScoregMemberComplete> filterList (
@@ -49,22 +53,31 @@ public class FilterHelper {
 
     private Predicate<ScoregMemberComplete> generateFilter(Distributor distributor) {
         return switch (distributor) {
+            case Gruppe -> memberComplete -> true; // schickt an alle
             case WiWoe -> memberComplete -> isStufe(memberComplete, SectionFilter.Stufe.WiWoe);
             case GuSp -> memberComplete -> isStufe(memberComplete, SectionFilter.Stufe.GuSp);
             case CaEx -> memberComplete -> isStufe(memberComplete, SectionFilter.Stufe.CaEx);
             case RaRo -> memberComplete -> isStufe(memberComplete, SectionFilter.Stufe.RaRo);
-            case Gruppenrat -> memberComplete -> jobFilter.isGruppenratParticipant(memberComplete);
-            case ScoutFix -> memberComplete -> jobFilter.isGruppenratParticipant(memberComplete)
-                    || jobFilter.isZBV(memberComplete)
-                    || jobFilter.isMitarbeiter(memberComplete);
-            case Gruppe -> memberComplete -> isStufe(memberComplete, SectionFilter.Stufe.ANY)
-                    || jobFilter.isGruppenratParticipant(memberComplete)
-                    || jobFilter.isZBV(memberComplete);
-            case Leiter -> memberComplete ->  jobFilter.isLeiter(memberComplete, SectionFilter.Stufe.ANY);
+            case Gruppenrat -> memberComplete -> isGruppenratParticipant(memberComplete);
+            case ScoutFix -> memberComplete -> isGruppenratParticipant(memberComplete)
+                    || jobFilter.hasJob(memberComplete, JobFilter.Job.ZBV)
+                    || jobFilter.hasJob(memberComplete, JobFilter.Job.Mitarbeiter);
+            case Leiter -> memberComplete ->  jobFilter.hasJob(memberComplete, JobFilter.Job.Leiter, SectionFilter.Stufe.ANY);
+            case Elternrat -> memberComplete -> jobFilter.hasJob(memberComplete, JobFilter.Job.ERO)
+                    || jobFilter.hasJob(memberComplete, JobFilter.Job.Elternratsmitglied)
+                    || jobFilter.hasJob(memberComplete, JobFilter.Job.Gruppenleitung);
         };
     }
 
     private Predicate<ScoregMemberComplete> generateAuthorizationFilter(Distributor distributor) {
         return memberComplete -> authorisationFilter.hasSendRights(memberComplete, distributor);
+    }
+
+    private Boolean isGruppenratParticipant(ScoregMemberComplete member) {
+        return jobFilter.hasJob(member, JobFilter.Job.Kassier)
+                || jobFilter.hasJob(member, JobFilter.Job.Leiter, SectionFilter.Stufe.ANY)
+                || jobFilter.hasJob(member, JobFilter.Job.ERO)
+                || jobFilter.hasJob(member, JobFilter.Job.GAB)
+                || jobFilter.hasJob(member, JobFilter.Job.Gruppenleitung);
     }
 }

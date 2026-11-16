@@ -18,19 +18,27 @@ public class AuthorisationFilter {
         List<String> jobList = Arrays.stream(member.getJobList().split(",")).toList();
         if (Objects.isNull(member.getJobList())) return false;
         Boolean hasSendRight = switch (distributor) {
-            case WiWoe -> jobFilter.isLeiter(member, SectionFilter.Stufe.WiWoe) && jobFilter.isStufenleitung(member);
-            case GuSp -> jobFilter.isLeiter(member, SectionFilter.Stufe.GuSp) && jobFilter.isStufenleitung(member);
-            case CaEx -> jobFilter.isLeiter(member, SectionFilter.Stufe.CaEx) && jobFilter.isStufenleitung(member);
-            case RaRo -> jobFilter.isLeiter(member, SectionFilter.Stufe.RaRo) && jobFilter.isStufenleitung(member);
-            case Gruppe -> jobFilter.isERO(member);
-            case ScoutFix -> jobFilter.isLeiter(member, SectionFilter.Stufe.ANY);
-            case Gruppenrat -> false;
-            case Leiter -> jobFilter.isLeiter(member, SectionFilter.Stufe.ANY);
+            case WiWoe -> jobFilter.hasJob(member, JobFilter.Job.Leiter, SectionFilter.Stufe.WiWoe);
+            case GuSp -> jobFilter.hasJob(member, JobFilter.Job.Leiter, SectionFilter.Stufe.GuSp);
+            case CaEx -> jobFilter.hasJob(member, JobFilter.Job.Leiter, SectionFilter.Stufe.CaEx);
+            case RaRo -> jobFilter.hasJob(member, JobFilter.Job.Leiter, SectionFilter.Stufe.RaRo);
+            case Gruppe -> jobFilter.hasJob(member, JobFilter.Job.ERO);
+            case Gruppenrat -> jobFilter.hasJob(member, JobFilter.Job.ERO);
+            case Leiter -> jobFilter.hasJob(member, JobFilter.Job.Leiter, SectionFilter.Stufe.ANY);
+            case Elternrat -> jobFilter.hasJob(member, JobFilter.Job.ERO)
+                    || jobFilter.hasJob(member, JobFilter.Job.Elternratsmitglied);
+            case ScoutFix -> jobFilter.hasJob(member, JobFilter.Job.Kassier)
+                    || jobFilter.hasJob(member, JobFilter.Job.Leiter, SectionFilter.Stufe.ANY)
+                    || jobFilter.hasJob(member, JobFilter.Job.ERO)
+                    || jobFilter.hasJob(member, JobFilter.Job.GAB)
+                    || jobFilter.hasJob(member, JobFilter.Job.Gruppenleitung)
+                    || jobFilter.hasJob(member, JobFilter.Job.ZBV)
+                    || jobFilter.hasJob(member, JobFilter.Job.Mitarbeiter);
         };
         if (hasSendRight) {
             return true;
         } else {
-            return jobFilter.isGruppenleitung(member);
+            return jobFilter.hasJob(member, JobFilter.Job.Gruppenleitung);
         }
     }
 }

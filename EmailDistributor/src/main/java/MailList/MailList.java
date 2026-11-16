@@ -19,13 +19,26 @@ public class MailList {
         this.name = distributor.name();
         this.mailList = new ArrayList<>();
         this.authorisations = new ArrayList<>();
+        authorisations.add("info@pfadfindergruppe71.at");
 
         FilterHelper filterHelper = new FilterHelper();
         List<ScoregMemberComplete> filtered = filterHelper.filterList(memberCompletes, distributor);
-        filtered.forEach(s -> mailList.addAll(s.getRelevantEmails()));
+        filtered.forEach(s ->
+                mailList.addAll(
+                        s.getRelevantEmails(
+                                filterHelper.isTeilnehmer(s)
+                        )
+                )
+        );
 
         List<ScoregMemberComplete> authorisationFiltered = filterHelper.filterListForAuthorization(memberCompletes, distributor);
-        authorisationFiltered.forEach(s -> authorisations.addAll(s.getRelevantEmails()));
+        authorisationFiltered.forEach(s ->
+                authorisations.addAll(
+                        s.getRelevantEmails(
+                                filterHelper.isTeilnehmer(s)
+                        )
+                )
+        );
     }
 
     private String generateDiscription(FilterHelper.Distributor distributor) {
@@ -35,6 +48,7 @@ public class MailList {
             case ScoutFix -> "Schickt aus an alle für Scout Fix relevante";
             case Gruppenrat -> "Schickt aus an alle GruppenratteilnehmerInnen";
             case Leiter -> "Schickt an aktive Leiter";
+            case Elternrat -> "Schickt an den Elternrat aus";
         };
     }
 

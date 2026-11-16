@@ -32,3 +32,5 @@ build/
 ### VS Code ###
 .vscode/
 /config/
+/Verteiler/configVerteiler.json
+/Verteiler/forwarding.csv

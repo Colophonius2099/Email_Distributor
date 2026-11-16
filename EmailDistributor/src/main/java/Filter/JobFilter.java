@@ -1,6 +1,7 @@
 package Filter;
 
 import ScoregDataSctructure.ScoregMemberComplete;
+import jakarta.annotation.Nullable;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -8,13 +9,14 @@ import java.util.function.BiConsumer;
 public class JobFilter {
 
     public enum Job {
-        ZBV, Leiter, Kassier, ERO, Gruppenleitung, GAB, Mitarbeiter
+        ZBV, Leiter, Kassier, ERO, Elternratsmitglied, Gruppenleitung, GAB, Mitarbeiter, Stufenleitung
     }
 
     private final List<String> zbvFilter = List.of("ZBV");
     private final List<String> mitarbeiterFilter = List.of("MA");
     private final List<String> kassierFilter = List.of("KASS");
     private final List<String> eroFilter = List.of("ERO");
+    private final List<String> elternratsmitgliedFilter = List.of("ER");
     private final List<String> gruppenleitungFilter = List.of("GL");
     private final List<String> gabFilter = List.of("GAB");
 
@@ -42,40 +44,73 @@ public class JobFilter {
         combined.forEach(list -> leiterFilter.addAll(list));
     }
 
+    public Boolean hasJob(ScoregMemberComplete memberComplete, Job job, SectionFilter.Stufe stufe) {
+        return switch (job) {
+            case ZBV -> isZBV(memberComplete);
+            case Leiter -> isLeiter(memberComplete, stufe);
+            case Kassier -> isKassier(memberComplete);
+            case ERO -> isERO(memberComplete);
+            case Elternratsmitglied -> isElternratsmitglied(memberComplete);
+            case Gruppenleitung -> isGruppenleitung(memberComplete);
+            case GAB -> isGAB(memberComplete);
+            case Mitarbeiter -> isMitarbeiter(memberComplete);
+            case Stufenleitung -> isStufenleitung(memberComplete) || isLeiter(memberComplete, stufe);
+        };
+    }
 
-    public Boolean isZBV(ScoregMemberComplete member) {
+    public Boolean hasJob(ScoregMemberComplete memberComplete, Job job) {
+        return switch (job) {
+            case ZBV -> isZBV(memberComplete);
+            case Leiter -> false;
+            case Kassier -> isKassier(memberComplete);
+            case ERO -> isERO(memberComplete);
+            case Elternratsmitglied -> isElternratsmitglied(memberComplete);
+            case Gruppenleitung -> isGruppenleitung(memberComplete);
+            case GAB -> isGAB(memberComplete);
+            case Mitarbeiter -> isMitarbeiter(memberComplete);
+            case Stufenleitung -> isStufenleitung(memberComplete);
+        };
+    }
+
+
+    private Boolean isZBV(ScoregMemberComplete member) {
         if (Objects.isNull(member) || Objects.isNull(member.getJobList())) return false;
         return Arrays.stream(member.getJobList().split(",")).anyMatch(zbvFilter::contains);
     }
 
-    public Boolean isMitarbeiter(ScoregMemberComplete member) {
+    private Boolean isMitarbeiter(ScoregMemberComplete member) {
         if (Objects.isNull(member) || Objects.isNull(member.getJobList())) return false;
         return Arrays.stream(member.getJobList().split(",")).anyMatch(mitarbeiterFilter::contains);
     }
 
-    public Boolean isGAB(ScoregMemberComplete member) {
+    private Boolean isGAB(ScoregMemberComplete member) {
         if (Objects.isNull(member) || Objects.isNull(member.getJobList())) return false;
         return Arrays.stream(member.getJobList().split(",")).anyMatch(gabFilter::contains);
     }
 
-    public Boolean isGruppenleitung(ScoregMemberComplete member) {
+    private Boolean isGruppenleitung(ScoregMemberComplete member) {
         if (Objects.isNull(member) || Objects.isNull(member.getJobList())) return false;
         return Arrays.stream(member.getJobList().split(",")).anyMatch(gruppenleitungFilter::contains);
     }
 
-    public Boolean isERO(ScoregMemberComplete member) {
+    private Boolean isERO(ScoregMemberComplete member) {
         if (Objects.isNull(member) || Objects.isNull(member.getJobList())) return false;
         return Arrays.stream(member.getJobList().split(",")).anyMatch(eroFilter::contains);
     }
 
-    public Boolean isKassier(ScoregMemberComplete member) {
+    private Boolean isElternratsmitglied(ScoregMemberComplete member) {
+        if (Objects.isNull(member) || Objects.isNull(member.getJobList())) return false;
+        return Arrays.stream(member.getJobList().split(",")).anyMatch(elternratsmitgliedFilter::contains);
+    }
+
+    private Boolean isKassier(ScoregMemberComplete member) {
         if (Objects.isNull(member) || Objects.isNull(member.getJobList())) return false;
         return Arrays.stream(member.getJobList().split(",")).anyMatch(kassierFilter::contains);
     }
 
-    public Boolean isLeiter(ScoregMemberComplete member, SectionFilter.Stufe stufe) {
+    private Boolean isLeiter(ScoregMemberComplete member, SectionFilter.Stufe stufe) {
         List<String> jobList = Arrays.stream(member.getJobList().split(",")).toList();
-        if (Objects.isNull(member.getJobList())) return false;
+        if (Objects.isNull(member.getJobList()) || Objects.isNull(stufe)) return false;
         return switch (stufe) {
             case WiWoe -> jobList.stream().anyMatch(wiwoeLeiterFilter::contains);
             case GuSp -> jobList.stream().anyMatch(guspLeiterFilter::contains);
@@ -86,17 +121,9 @@ public class JobFilter {
         };
     }
 
-    public Boolean isStufenleitung(ScoregMemberComplete member) {
+    private Boolean isStufenleitung(ScoregMemberComplete member) {
         List<String> jobList = Arrays.stream(member.getJobList().split(",")).toList();
         if (Objects.isNull(member.getJobList())) return false;
         return jobList.stream().anyMatch(s -> s.contains("SF"));
-    }
-
-    public Boolean isGruppenratParticipant(ScoregMemberComplete member) {
-        return isKassier(member)
-                || isLeiter(member, SectionFilter.Stufe.ANY)
-                || isERO(member)
-                || isGAB(member)
-                || isGruppenleitung(member);
     }
 }

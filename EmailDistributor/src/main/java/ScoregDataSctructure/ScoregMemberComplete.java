@@ -60,23 +60,16 @@ public class ScoregMemberComplete {
 		return jobList;
 	}
 
-	public List<String> getRelevantEmails() {
+	public List<String> getRelevantEmails(Boolean shouldAddParentEmail) {
 		return java.util.stream.Stream.of(
 						emailPrimary,
 						emailSecondary,
-						(parents != null) && shouldUseParentEmail() ? parents.getFatherEmail() : null,
-						(parents != null) && shouldUseParentEmail() ? parents.getMotherEmail() : null
+						(parents != null) && shouldAddParentEmail ? parents.getFatherEmail() : null,
+						(parents != null) && shouldAddParentEmail ? parents.getMotherEmail() : null
 				)
 				.filter(Objects::nonNull)
 				.filter(s -> !s.isBlank())
 				.collect(Collectors.toList());
-	}
-
-	private Boolean shouldUseParentEmail() {
-		if (Objects.nonNull(emailPrimary) && Objects.nonNull(emailSecondary)) {
-			return emailPrimary.isBlank() && emailSecondary.isBlank();
-		}
-		return true;
 	}
 
 	@JsonSetter("parents")
